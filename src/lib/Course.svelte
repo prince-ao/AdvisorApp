@@ -1,22 +1,35 @@
 <script lang="ts">
-  import { onMount } from 'svelte';
+  import { onMount, createEventDispatcher } from 'svelte';
+    import type { CourseT } from './types';
 
-  export let name: string;
-  export let credits: number;
+  export let course: CourseT;
+  let { name, credits } = course;
 
+  const dispatch = createEventDispatcher();
   let isDragging = false;
   let courseSelected = false;
   let offsetX = 0, offsetY = 0;
+  let mouseX = 0, mouseY = 0;
 	let divElement: HTMLDivElement | null = null;
+
+  $: if(isDragging) {
+    emitDrag();
+  } 
 
   onMount(() => {
     document.addEventListener('mousemove', (e) => {
+      mouseX = e.x;
+      mouseY = e.y;
       if(isDragging) {
-        divElement!.style.left = `${e.x - offsetX}px`;
-        divElement!.style.top = `${e.y - offsetY}px`;
+        divElement!.style.left = `${mouseX - offsetX}px`;
+        divElement!.style.top = `${mouseY - offsetY}px`;
       }
     })
   })
+
+  function emitDrag() {
+    dispatch('drag', { name, credits, x: mouseX - offsetX, y: mouseY - offsetY });
+  }
 
 /* Bug with clicking new line when editing content: fix (no new lines) */
 </script>
@@ -33,7 +46,7 @@
     }
   }}
   role="button" tabindex="0" 
-  class={`flex flex-col items-center justify-center gap-4 border-2 border-black w-[300px] h-[150px] rounded-3xl absolute top-[200px] left-[200px] cursor-grab ${isDragging ? 'cursor-grabbing' : ''}`}
+  class={`flex flex-col items-center justify-center gap-4 border-2 border-black w-[300px] h-[150px] rounded-3xl absolute left-[${course.x}px] top-[${course.x}px] cursor-grab ${isDragging ? 'cursor-grabbing' : ''}`}
 >
   <button 
     on:click={() => courseSelected = !courseSelected} 

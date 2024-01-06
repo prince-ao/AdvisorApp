@@ -7,8 +7,8 @@
     {
       name: "MTH 126",
       credits: 3,
-      x: Math.floor(Math.random() * 1500), // fix: change 1500 to screen width
-      y: Math.floor(Math.random() * 1000), // fix: change 1000 to screen height
+      x: 200, // fix: change to screen width
+      y: 300, // fix: change to screen height
     }
   ];
 </script>
