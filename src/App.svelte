@@ -10,6 +10,8 @@
       credits: 3,
       x: 300, // fix: change to screen width
       y: 300, // fix: change to screen height
+      w: 300,
+      h: 150,
     }
   ];
 </script>
