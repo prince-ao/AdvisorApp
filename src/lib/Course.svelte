@@ -19,14 +19,21 @@
     emitDrag();
   }
 
+  $: {
+    if(divElement) {
+      divElement.style.left = `${course.x}px`;
+      divElement.style.top = `${course.y}px`;
+    }
+  }
+
   onMount(() => {
     document.addEventListener('mousemove', (e) => {
       mouseX = e.x;
       mouseY = e.y;
 
       if(isDragging) {
-        divElement!.style.left = `${mouseX - offsetX}px`;
-        divElement!.style.top = `${mouseY - offsetY}px`;
+        course.x = mouseX - offsetX;
+        course.y = mouseY - offsetY;
       }
     })
 

@@ -8,10 +8,10 @@
       courseID: 1,
       name: "MTH 126",
       credits: 3,
-      x: 300, // fix: change to screen width
-      y: 300, // fix: change to screen height
+      x: 300,
+      y: 300,
       w: 300,
-      h: 150,
+      h: 150
     }
   ];
 </script>

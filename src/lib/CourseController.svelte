@@ -46,6 +46,10 @@
       }
     })
 
+    setInterval(() => {
+      handleCollisions();
+    }, 33);
+
     
   })
 
@@ -75,6 +79,39 @@
       return false;
     }
     return Math.sqrt(Math.pow(point2[0]-point1[0], 2) + Math.pow(point2[1]-point1[1], 2)) <= delta;
+  }
+
+  function resolveCollision(course1, course2) {
+    const overlapX = Math.min(course1.x + course1.w, course2.x + course2.w) - Math.max(course1.x, course2.x);
+    const overlapY = Math.min(course1.y + course1.h, course2.y + course2.h) - Math.max(course1.y, course2.y);
+
+    if (overlapX < overlapY) {
+      const moveX = overlapX / 2;
+      course1.x -= moveX;
+      course2.x += moveX;
+    } else {
+      const moveY = overlapY / 2;
+      course1.y -= moveY;
+      course2.y += moveY;
+    }
+  }
+
+  function handleCollisions() {
+    for(let i = 0; i < courses.length; i++) {
+      for(let j = i + 1; j < courses.length; j++) {
+        if(checkCollision(courses[i], courses[j])) {
+          resolveCollision(courses[i], courses[j]);
+          courses = courses
+        }
+      }
+    }
+  }
+
+  function checkCollision(course1: CourseT, course2: CourseT) {
+    const collisionX = course1.x + course1.w >= course2.x && course1.x <= course2.x + course2.w;
+    const collisionY = course1.y + course1.h >= course2.y && course1.y <= course2.y + course2.h;
+
+    return collisionX && collisionY;
   }
 </script>
 
