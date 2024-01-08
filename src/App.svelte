@@ -5,9 +5,11 @@
 
   const courses: Courses = [
     {
+      courseID: 1,
+      selected: false,
       name: "MTH 126",
       credits: 3,
-      x: 200, // fix: change to screen width
+      x: 300, // fix: change to screen width
       y: 300, // fix: change to screen height
     }
   ];
