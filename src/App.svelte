@@ -6,7 +6,6 @@
   const courses: Courses = [
     {
       courseID: 1,
-      selected: false,
       name: "MTH 126",
       credits: 3,
       x: 300, // fix: change to screen width

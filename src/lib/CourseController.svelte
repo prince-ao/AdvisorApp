@@ -6,6 +6,7 @@
   export let courses: Courses;
   let courseDragging: [number, number] | null = null;
   let shiftDown = false;
+  let selectedCourse: CourseID | null = null;
 
   onMount(() => {
     document.addEventListener('keydown', (e: KeyboardEvent) => {
@@ -21,11 +22,11 @@
     })
 
     document.addEventListener('keypress', (e) => {
-      console.log('here')
-      if(e.key === 'Backspace') {
-        courses = courses.filter((course) => !course.selected);
-        courses = courses;
+      if(e.key === 'd') {
         console.log(courses)
+        console.log(selectedCourse)
+        courses = courses.filter((course) => course.courseID !== selectedCourse);
+        courses = courses;
       }
     })
 
@@ -38,16 +39,17 @@
       const newCourse = structuredClone(courses[courses.length - 1]);
       [newCourse.x, newCourse.y] = [e.detail.x, e.detail.y];
       newCourse.courseID = newCourse.courseID + 1;
-      newCourse.selected = false;
       courses = [...courses, newCourse];
     }
   }
 
   function handleClick(e: CustomEvent) {
     if(JSON.stringify(courseDragging) === JSON.stringify([e.detail.x, e.detail.y])) {
-      for(let course of courses) {
-        if(course.courseID === e.detail.courseID) course.selected = !course.selected;
-        else course.selected = false;
+      console.log(e.detail)
+      if(selectedCourse === e.detail.courseID) {
+        selectedCourse = null;
+      } else {
+        selectedCourse = e.detail.courseID;
       }
     }
     courses = courses
@@ -57,7 +59,7 @@
 <main>
   <div class="absolute">
     {#each courses as course }
-      <Course { course } on:drag={handleDrag} on:click={handleClick} bind:selected={course.selected} />
+      <Course { course } on:drag={handleDrag} on:click={handleClick} bind:selected={selectedCourse} />
     {/each}
   </div>
 </main>

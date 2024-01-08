@@ -2,7 +2,7 @@
   import { onMount, createEventDispatcher } from 'svelte';
     import type { CourseT } from './types';
 
-  export let selected = false;
+  export let selected: number | null;
   export let course: CourseT;
   let { name, credits, courseID } = course;
 
@@ -32,6 +32,7 @@
       divElement.style.left = `${course.x}px`;
       divElement.style.top = `${course.y}px`;
     }
+
   })
 
   function emitDrag() {
@@ -57,7 +58,7 @@
     }
   }}
   on:click={emitClick}
-  class={`flex flex-col items-center justify-center gap-4 border-2 w-[300px] h-[150px] rounded-3xl absolute cursor-grab ${selected ? 'border-amber-500' : 'border-black'} ${isDragging ? 'cursor-grabbing' : ''}`}
+  class={`flex flex-col items-center justify-center gap-4 border-2 w-[300px] h-[150px] rounded-3xl absolute cursor-grab ${selected === courseID ? 'border-amber-500' : 'border-black'} ${isDragging ? 'cursor-grabbing' : ''}`}
 >
   <button 
     on:click={() => courseTaken = !courseTaken} 
