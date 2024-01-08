@@ -44,8 +44,7 @@
   }
 
   function handleClick(e: CustomEvent) {
-    if(JSON.stringify(courseDragging) === JSON.stringify([e.detail.x, e.detail.y])) {
-      console.log(e.detail)
+    if(isClose(courseDragging, [e.detail.x, e.detail.y], 5)) {
       if(selectedCourse === e.detail.courseID) {
         selectedCourse = null;
       } else {
@@ -53,6 +52,13 @@
       }
     }
     courses = courses
+  }
+
+  function isClose(point1: [number, number] | null, point2: [number, number], delta: number) {
+    if(point1 === null) {
+      return false;
+    }
+    return Math.sqrt(Math.pow(point2[0]-point1[0], 2) + Math.pow(point2[1]-point1[1], 2)) <= delta;
   }
   </script>
 
