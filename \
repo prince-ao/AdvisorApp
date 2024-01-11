@@ -48,6 +48,14 @@
 
   })
 
+
+
+  function setCursor(cursor: string) {
+    if(divElement){
+      divElement.style.cursor = cursor;
+    }
+  }
+
   function emitDrag() {
     dispatch('drag', { name, credits, courseID, x: mouseX - offsetX, y: mouseY - offsetY });
   }
@@ -88,45 +96,40 @@
   ></button>
   <!-- connector buttons -->
   <button 
-    on:focus={() => { /* A11y */ }}
-    on:blur={() => { /* A11y */ }}
     on:mousedown={(e) => {
       draggingLock = true;
       dispatch('southDown', e)
     }}
     on:mousemove={(e) => dispatch('southDrag', e)}
-    on:mouseover={() => dispatch('southOver', { courseID })}
-    on:mouseout={() => dispatch('southOut', { courseID })}
     class={`rounded-full w-[20px] h-[20px] bg-black absolute ${mouseOver || draggingLock ? 'block' : 'hidden'} bottom-[-10px] cursor-crosshair z-50`}
   ></button>
 
-  <!--
   <button 
     on:mousedown={(e) => {
       draggingLock = true;
-      dispatch('northDown', e)
+      dispatch('southDown', e)
     }}
-    on:mousemove={(e) => dispatch('northDrag', e)}
+    on:mousemove={(e) => dispatch('southDrag', e)}
     class={`rounded-full w-[20px] h-[20px] bg-black absolute ${mouseOver || draggingLock ? 'block' : 'hidden'} top-[-10px] cursor-crosshair z-50`}
   ></button>
 
   <button 
     on:mousedown={(e) => {
       draggingLock = true;
-      dispatch('westDown', e)
+      dispatch('southDown', e)
     }}
-    on:mousemove={(e) => dispatch('westDrag', e)}
+    on:mousemove={(e) => dispatch('southDrag', e)}
     class={`rounded-full w-[20px] h-[20px] bg-black absolute ${mouseOver || draggingLock ? 'block' : 'hidden'} start-[-10px] cursor-crosshair z-50`}
   ></button>
   
   <button 
     on:mousedown={(e) => {
       draggingLock = true;
-      dispatch('eastDown', e)
+      dispatch('southDown', e)
     }}
-    on:mousemove={(e) => dispatch('eastDrag', e)}
+    on:mousemove={(e) => dispatch('southDrag', e)}
     class={`rounded-full w-[20px] h-[20px] bg-black absolute ${mouseOver || draggingLock ? 'block' : 'hidden'} end-[-10px] cursor-crosshair z-50`}
-  ></button> -->
+  ></button>
   <!-- connector buttons -->
   
   <h1 

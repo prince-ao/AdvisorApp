@@ -1,19 +1,27 @@
 <script lang="ts">
   import { onMount } from 'svelte';
   import { Course } from '.';
-  import type { Courses, CourseT, CourseID } from './types';
+  import type { CourseT, CourseID } from './types';
+  import { courses } from './courseStore';
+  import { getCourseByCourseID } from './utils/query';
+  import { checkCollision, resolveCollision } from './utils/collision';
 
-  export let courses: Courses;
   let courseDragging: [number, number] | null = null;
   let shiftDown = false;
   let selectedCourse: CourseID | null = null;
   let southStart = [0, 0], southEnd = [0, 0];
-  let southDrag = [false, false];
+  let currentDragging: CourseID | null = null
+  let drag = {
+    south: [false, false],
+    north: [false, false],
+    east: [false, false],
+    west: [false, false],
+  }
   let internalLock = false;
 
   onMount(() => {
     document.addEventListener('mousemove', (e) => {
-      if(southDrag[1]) {
+      if(drag.south[1]) {
         southEnd = [e.x, e.y];
       }
     })
@@ -21,7 +29,8 @@
     document.addEventListener('mouseup', (e) => {
       southEnd = [0, 0] 
       southStart = [0, 0]
-      southDrag = false;
+      drag.south = [false, false];
+      currentDragging = null;
       internalLock = false;
     })
 
@@ -41,8 +50,8 @@
       if(e.key === 'd') {
         console.log(courses)
         console.log(selectedCourse)
-        courses = courses.filter((course) => course.courseID !== selectedCourse);
-        courses = courses;
+        $courses = $courses.filter((course) => course.courseID !== selectedCourse);
+        $courses = $courses;
       }
     })
 
@@ -56,10 +65,10 @@
   function handleDrag(e: CustomEvent) {
     courseDragging = [e.detail.x, e.detail.y];
     if(shiftDown) {
-      const newCourse = structuredClone(courses[courses.length - 1]);
+      const newCourse = structuredClone($courses[$courses.length - 1]);
       [newCourse.x, newCourse.y] = [e.detail.x, e.detail.y];
       newCourse.courseID = newCourse.courseID + 1;
-      courses = [...courses, newCourse];
+      $courses = [...$courses, newCourse];
     }
   }
 
@@ -71,7 +80,7 @@
         selectedCourse = e.detail.courseID;
       }
     }
-    courses = courses
+    $courses = $courses
   }
 
   function isClose(point1: [number, number] | null, point2: [number, number], delta: number) {
@@ -81,43 +90,21 @@
     return Math.sqrt(Math.pow(point2[0]-point1[0], 2) + Math.pow(point2[1]-point1[1], 2)) <= delta;
   }
 
-  function resolveCollision(course1, course2) {
-    const overlapX = Math.min(course1.x + course1.w, course2.x + course2.w) - Math.max(course1.x, course2.x);
-    const overlapY = Math.min(course1.y + course1.h, course2.y + course2.h) - Math.max(course1.y, course2.y);
-
-    if (overlapX < overlapY) {
-      const moveX = overlapX / 2;
-      course1.x -= moveX;
-      course2.x += moveX;
-    } else {
-      const moveY = overlapY / 2;
-      course1.y -= moveY;
-      course2.y += moveY;
-    }
-  }
-
   function handleCollisions() {
-    for(let i = 0; i < courses.length; i++) {
-      for(let j = i + 1; j < courses.length; j++) {
-        if(checkCollision(courses[i], courses[j])) {
-          resolveCollision(courses[i], courses[j]);
-          courses = courses
+    for(let i = 0; i < $courses.length; i++) {
+      for(let j = i + 1; j < $courses.length; j++) {
+        if(checkCollision($courses[i], $courses[j])) {
+          resolveCollision($courses[i], $courses[j]);
+          $courses = $courses
         }
       }
     }
-  }
-
-  function checkCollision(course1: CourseT, course2: CourseT) {
-    const collisionX = course1.x + course1.w >= course2.x && course1.x <= course2.x + course2.w;
-    const collisionY = course1.y + course1.h >= course2.y && course1.y <= course2.y + course2.h;
-
-    return collisionX && collisionY;
   }
 </script>
 
 <main>
   <div class="absolute">
-    {#each courses as course }
+    {#each $courses as course }
       <Course 
         course={ course } 
         on:drag={handleDrag} 
@@ -126,15 +113,24 @@
         bind:draggingLock={internalLock}
         on:southDown={(e) => {
           southStart = [e.detail.x, e.detail.y];
-          southDrag = [true, false];
+          drag.south = [true, false];
         }}
         on:southDrag={(e) => {
-          if(southDrag[0]) {
-            southDrag[1] = true;
+          if(drag.south[0]) {
+            drag.south[1] = true;
+            currentDragging = e.detail.courseID;
+          }
+        }}
+        on:southOver={(e) => {
+          if(currentDragging && e.detail.courseID !== currentDragging) {
+            let overCourse = getCourseByCourseID(e.detail.courseID)
+            if(overCourse !== null) {
+              overCourse.subseqs.push(currentDragging);
+            }
           }
         }}
       />
-      {#if southDrag[0] && southDrag[1]}
+      {#if drag.south[0] && drag.south[1]}
         <svg class="absolute top-0 left-0 w-[100vw] h-[100vh]">
           <line x1={southStart[0]} y1={southStart[1]} x2={southEnd[0]} y2={southEnd[1]} stroke="black" stroke-width="2" />
         </svg>

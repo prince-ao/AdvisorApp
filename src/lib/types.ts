@@ -1,11 +1,14 @@
 export interface CourseT {
-  courseID: number;
+  courseID: CourseID;
   name: string;
   credits: number;
   x: number;
   y: number;
   w: number;
   h: number;
+  prereqs: CourseID[];
+  subseqs: CourseID[];
+  coreqs: CourseID[];
 }
 
 export type Courses = CourseT[];
