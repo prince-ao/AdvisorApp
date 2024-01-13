@@ -34,8 +34,17 @@
       if(isDragging) {
         course.x = mouseX - offsetX;
         course.y = mouseY - offsetY;
+
+        handleDragUpdate()
       }
     })
+
+    document.addEventListener('mouseup', () => {
+      if (isDragging) {
+        isDragging = false;
+        handleDragEnd();
+      }
+    });
 
 
     if(divElement) {
@@ -48,10 +57,19 @@
 
   })
 
+  function handleDragEnd() {
+    // Logic to handle the end of a drag, if needed
+    // This might include state reset or cleanup
+  }
+
+  function handleDragUpdate() {
+    dispatch('updatePosition', { courseID, newX: course.x, newY: course.y });
+  }
+
   function emitDrag() {
     dispatch('drag', { name, credits, courseID, x: mouseX - offsetX, y: mouseY - offsetY });
   }
-
+  
   function emitClick() {
     dispatch('click', { name, credits, courseID, x: mouseX - offsetX, y: mouseY - offsetY });
   }
@@ -92,9 +110,9 @@
     on:blur={() => { /* A11y */ }}
     on:mousedown={(e) => {
       draggingLock = true;
-      dispatch('southDown', e)
+      dispatch('southDown', {e, courseID })
     }}
-    on:mousemove={(e) => dispatch('southDrag', e)}
+    on:mousemove={(e) => dispatch('southDrag', {e, courseID })}
     on:mouseover={() => dispatch('southOver', { courseID })}
     on:mouseout={() => dispatch('southOut', { courseID })}
     class={`rounded-full w-[20px] h-[20px] bg-black absolute ${mouseOver || draggingLock ? 'block' : 'hidden'} bottom-[-10px] cursor-crosshair z-50`}
